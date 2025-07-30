@@ -49,11 +49,17 @@
     font-size: 12px;
     color: #bbb;
   }
+  #accessMsg {
+    color: orange;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 </style>
 </head>
 <body>
 
 <h2>Interactive Radar Squares with Continuous Sweep</h2>
+<div id="accessMsg"></div>
 <div id="instructions">
   Click on the map to add a square.<br/>
   Click a square to toggle its color (green/red).<br/>
@@ -77,20 +83,27 @@
 const canvas = document.getElementById('radarCanvas');
 const ctx = canvas.getContext('2d');
 
+// 🔐 Allow interaction only with ?edit=true in the URL
+const allowInteraction = window.location.href.includes("edit=true");
+if (!allowInteraction) {
+  canvas.style.pointerEvents = "none";
+  document.getElementById('accessMsg').innerText = "View Only – Editing Disabled";
+}
+
 const mapImage = new Image();
 mapImage.src = 'forecast map.png'; // Your map image file
 
-const squares = []; // {x, y, color} with 'green' or 'red'
+const squares = [];
 const squareSize = 14;
 
-let beamAngle = 0; // radians
+let beamAngle = 0;
 
 function drawRadarBeam() {
   const centerX = canvas.width / 2.4;
   const centerY = canvas.height / 2.45;
   const beamRadius = Math.max(canvas.width, canvas.height);
 
-  const beamWidth = Math.PI / 16; // ~11.25 degrees beam width
+  const beamWidth = Math.PI / 16;
 
   const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, beamRadius);
   gradient.addColorStop(0, 'rgba(0, 255, 0, 0.25)');
@@ -129,42 +142,44 @@ function findSquare(x, y) {
   );
 }
 
-canvas.addEventListener('click', e => {
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+if (allowInteraction) {
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
 
-  const sq = findSquare(clickX, clickY);
+    const sq = findSquare(clickX, clickY);
 
-  if (sq) {
-    sq.color = sq.color === 'green' ? 'red' : 'green';
-  } else {
-    squares.push({ x: clickX, y: clickY, color: 'green' });
-  }
+    if (sq) {
+      sq.color = sq.color === 'green' ? 'red' : 'green';
+    } else {
+      squares.push({ x: clickX, y: clickY, color: 'green' });
+    }
 
-  draw();
-});
-
-canvas.addEventListener('dblclick', e => {
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  const index = squares.findIndex(sq =>
-    clickX >= sq.x - squareSize / 2 &&
-    clickX <= sq.x + squareSize / 2 &&
-    clickY >= sq.y - squareSize / 2 &&
-    clickY <= sq.y + squareSize / 2
-  );
-
-  if (index !== -1) {
-    squares.splice(index, 1);
     draw();
-  }
-});
+  });
+
+  canvas.addEventListener('dblclick', e => {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    const index = squares.findIndex(sq =>
+      clickX >= sq.x - squareSize / 2 &&
+      clickX <= sq.x + squareSize / 2 &&
+      clickY >= sq.y - squareSize / 2 &&
+      clickY <= sq.y + squareSize / 2
+    );
+
+    if (index !== -1) {
+      squares.splice(index, 1);
+      draw();
+    }
+  });
+}
 
 function animate() {
-  beamAngle += 0.02; // Adjust speed here (radians per frame)
+  beamAngle += 0.02;
   if (beamAngle > 2 * Math.PI) beamAngle -= 2 * Math.PI;
   draw();
   requestAnimationFrame(animate);
