@@ -45,10 +45,6 @@
   .color-red {
     background-color: rgba(255,0,0,0.8);
   }
-  .params {
-    font-size: 12px;
-    color: #bbb;
-  }
   #accessMsg {
     color: orange;
     font-weight: bold;
@@ -71,11 +67,9 @@
 <div id="legend">
   <div class="legend-item">
     <div class="color-box color-green"></div> Precipitation (Rain)
-    <div class="params">Evapo ≤ 5.0, AQI &lt; 52</div>
   </div>
   <div class="legend-item">
     <div class="color-box color-red"></div> Severe Weather
-    <div class="params">Evapo ≤ 5.0, AQI ≥ 52</div>
   </div>
 </div>
 
@@ -83,7 +77,6 @@
 const canvas = document.getElementById('radarCanvas');
 const ctx = canvas.getContext('2d');
 
-// 🔐 Allow interaction only with ?edit=true in the URL
 const allowInteraction = window.location.href.includes("edit=true");
 if (!allowInteraction) {
   canvas.style.pointerEvents = "none";
@@ -91,7 +84,7 @@ if (!allowInteraction) {
 }
 
 const mapImage = new Image();
-mapImage.src = 'forecast map.png'; // Your map image file
+mapImage.src = 'forecast map.png';
 
 const squares = [];
 const squareSize = 14;
