@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Non-Interactive Radar Squares with Continuous Beam</title>
+  <title>Interactive Radar Map with Continuous Sweep</title>
   <style>
     body {
       background: #222;
@@ -13,7 +13,7 @@
     }
     canvas {
       border: 1px solid #444;
-      cursor: default;
+      cursor: crosshair;
       display: block;
       margin: 0 auto 10px;
       background: #000;
@@ -43,13 +43,27 @@
     .color-tornado { background-color: rgba(255, 0, 0, 0.8); }      /* Red */
     .color-funnel { background-color: rgba(128, 0, 128, 0.8); }     /* Purple */
     .color-flooding { background-color: rgba(0, 255, 255, 0.8); }   /* Cyan */
+    #controls {
+      margin: 15px;
+    }
+    button {
+      font-size: 14px;
+      padding: 6px 12px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-<h2>Radar Squares Display (Non-Interactive)</h2>
+<h2>Interactive Radar Map with Continuous Sweep</h2>
 
 <canvas id="radarCanvas" width="800" height="600"></canvas>
+
+<div id="controls">
+  <button id="stopRadarBtn" onclick="stopRadar()">⏸️ Stop Radar Beam</button>
+  <button id="startRadarBtn" onclick="startRadar()" style="display:none;">▶️ Start Radar Beam</button>
+</div>
 
 <div id="legend">
   <div class="legend-item">
@@ -76,26 +90,23 @@ const ctx = canvas.getContext('2d');
 const mapImage = new Image();
 mapImage.src = 'forecast map.jpg';
 
-const squareSize = 14;
-
-const threatColors = {
-  hail: 'rgba(0, 123, 255, 0.8)',      // Blue
-  wind: 'rgba(255, 127, 0, 0.8)',      // Orange
-  tornado: 'rgba(255, 0, 0, 0.8)',     // Red
-  funnel: 'rgba(128, 0, 128, 0.8)',    // Purple
-  flooding: 'rgba(0, 255, 255, 0.8)'   // Cyan
-};
-
-// Preset threat squares (customize these coordinates & threats)
-const squares = [
-  { x: 420, y: 80, threat: 'hail' },
-  { x: 460, y: 120, threat: 'wind' },
-  { x: 500, y: 160, threat: 'tornado' },
-  { x: 540, y: 200, threat: 'funnel' },
-  { x: 580, y: 240, threat: 'flooding' }
-];
-
 let beamAngle = 0; // radians
+let radarActive = true;
+
+const stopBtn = document.getElementById('stopRadarBtn');
+const startBtn = document.getElementById('startRadarBtn');
+
+function stopRadar() {
+  radarActive = false;
+  stopBtn.style.display = 'none';
+  startBtn.style.display = 'inline-block';
+}
+
+function startRadar() {
+  radarActive = true;
+  stopBtn.style.display = 'inline-block';
+  startBtn.style.display = 'none';
+}
 
 function drawRadarBeam() {
   const centerX = canvas.width / 2.4;
@@ -119,20 +130,16 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
 
-  squares.forEach(sq => {
-    ctx.fillStyle = threatColors[sq.threat];
-    ctx.fillRect(sq.x - squareSize / 2, sq.y - squareSize / 2, squareSize, squareSize);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(sq.x - squareSize / 2, sq.y - squareSize / 2, squareSize, squareSize);
-  });
-
-  drawRadarBeam();
+  // No squares drawn here (removed)
+  
+  if (radarActive) drawRadarBeam();
 }
 
 function animate() {
-  beamAngle += 0.02;
-  if (beamAngle > 2 * Math.PI) beamAngle -= 2 * Math.PI;
+  if (radarActive) {
+    beamAngle += 0.02;
+    if (beamAngle > 2 * Math.PI) beamAngle -= 2 * Math.PI;
+  }
   draw();
   requestAnimationFrame(animate);
 }
