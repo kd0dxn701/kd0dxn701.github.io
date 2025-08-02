@@ -1,101 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Interactive Radar Squares with Continuous Sweep</title>
-  <style>
-    body {
-      background-color: #222;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    canvas {
-      display: block;
-      margin: 20px auto;
-      background-color: black;
-    }
-    .legend {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 10px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-    }
-    .color-box {
-      width: 20px;
-      height: 20px;
-      border: 1px solid #fff;
-    }
-    .green { background-color: lime; }
-    .red { background-color: red; }
-  </style>
+<meta charset="UTF-8" />
+<title>Evapo Radar - Non-Interactive Multi-Threat Display</title>
+<style>
+  body {
+    background: #222;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+  }
+  canvas {
+    border: 1px solid #444;
+    cursor: default;
+    display: block;
+    margin: 0 auto 10px;
+    background: #000;
+  }
+  #instructions {
+    margin-bottom: 10px;
+    color: #888;
+  }
+  #legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    min-width: 100px;
+  }
+  .color-box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #eee;
+  }
+  .color-hail { background-color: #007bff; }       /* Blue */
+  .color-wind { background-color: #ff7f00; }       /* Orange */
+  .color-tornado { background-color: #ff0000; }    /* Red */
+  .color-funnel { background-color: #800080; }     /* Purple */
+  .color-flooding { background-color: #00ffff; }   /* Cyan */
+</style>
 </head>
 <body>
 
-  <h1>Interactive Radar Squares with Continuous Sweep</h1>
-  <h1 style="text-align:center; color:red; font-family:sans-serif;">
-    Radar is down at night unless severe weather.
-  </h1>
-  <h3 style="color: orange;">View Only – Editing Disabled</h3>
+<h2>Evapo Radar - Multi-Threat Display (View Only)</h2>
+<div id="instructions">
+  This is a non-interactive view-only radar display.<br/>
+  Squares show threat locations and types.
+</div>
 
-  <!-- ✅ New Header Added -->
-  <h2 style="color: white; margin-top: 20px;">
-    Updated every hour unless severe weather is possible.
-  </h2>
+<canvas id="radarCanvas" width="800" height="600"></canvas>
 
-  <canvas id="radarCanvas" width="700" height="600"></canvas>
-
-  <div class="legend">
-    <div class="legend-item">
-      <div class="color-box green"></div> Precipitation (Rain)
-    </div>
-    <div class="legend-item">
-      <div class="color-box red"></div> Severe Weather
-    </div>
+<div id="legend">
+  <div class="legend-item">
+    <div class="color-box color-hail"></div> Hail
   </div>
+  <div class="legend-item">
+    <div class="color-box color-wind"></div> Wind
+  </div>
+  <div class="legend-item">
+    <div class="color-box color-tornado"></div> Tornado
+  </div>
+  <div class="legend-item">
+    <div class="color-box color-funnel"></div> Funnel
+  </div>
+  <div class="legend-item">
+    <div class="color-box color-flooding"></div> Flooding
+  </div>
+</div>
 
-  <script>
-    const canvas = document.getElementById("radarCanvas");
-    const ctx = canvas.getContext("2d");
+<script>
+const canvas = document.getElementById('radarCanvas');
+const ctx = canvas.getContext('2d');
 
-    const mapImage = new Image();
-    mapImage.src = 'forecast map.jpg'; // Your current map file
+const mapImage = new Image();
+mapImage.src = 'forecast map.png'; // Your static map image file
 
-    let angle = 0;
-    let radarActive = true;
+const squareSize = 14;
+const threatColors = {
+  hail: 'rgba(0, 123, 255, 0.8)',      // Blue
+  wind: 'rgba(255, 127, 0, 0.8)',      // Orange
+  tornado: 'rgba(255, 0, 0, 0.8)',     // Red
+  funnel: 'rgba(128, 0, 128, 0.8)',    // Purple
+  flooding: 'rgba(0, 255, 255, 0.8)'   // Cyan
+};
 
-    mapImage.onload = () => {
-      draw();
-    };
+// PRESET threat squares (example positions and types)
+// You can customize or generate this array dynamically
+const squares = [
+  { x: 420, y: 80, threat: 'hail' },
+  { x: 460, y: 120, threat: 'wind' },
+  { x: 500, y: 160, threat: 'tornado' },
+  { x: 540, y: 200, threat: 'funnel' },
+  { x: 580, y: 240, threat: 'flooding' }
+];
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
 
-      if (radarActive) {
-        const cx = canvas.width / 2.4;
-        const cy = canvas.height / 2.5;
-        const length = Math.max(canvas.width, canvas.height);
+  squares.forEach(sq => {
+    ctx.fillStyle = threatColors[sq.threat];
+    ctx.fillRect(sq.x - squareSize / 2, sq.y - squareSize / 2, squareSize, squareSize);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(sq.x - squareSize / 2, sq.y - squareSize / 2, squareSize, squareSize);
+  });
+}
 
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + length * Math.cos(angle), cy + length * Math.sin(angle));
-        ctx.strokeStyle = "lime";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+mapImage.onload = () => {
+  draw();
+};
+</script>
 
-        angle += 0.02;
-      }
-
-      requestAnimationFrame(draw);
-    }
-  </script>
 </body>
 </html>
-
