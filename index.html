@@ -74,13 +74,13 @@ const canvas = document.getElementById('radarCanvas');
 const ctx = canvas.getContext('2d');
 
 const mapImage = new Image();
-mapImage.src = 'forecast map.jpg';
+mapImage.src = 'MAP.jpg';
 
 let beamAngle = 0; // radians
 
 function drawRadarBeam() {
-  const centerX = canvas.width / 2.4;
-  const centerY = canvas.height / 2.45;
+  const centerX = canvas.width / 1.7;
+  const centerY = canvas.height / 1.72;
   const beamRadius = Math.max(canvas.width, canvas.height);
   const beamWidth = Math.PI / 16;
 
