@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -85,6 +85,7 @@
     .red-box { background-color: red; }
     .purple-box { background-color: purple; }
     .green-box { background-color: green; }
+    .yellow-box { background-color: yellow; }
   </style>
 </head>
 <body>
@@ -123,6 +124,7 @@
   <div class="legend-item"><div class="color-box red-box"></div> Tornado / Funnel Risk</div>
   <div class="legend-item"><div class="color-box purple-box"></div> Hail / Wind Risk</div>
   <div class="legend-item"><div class="color-box green-box"></div> Flooding Risk</div>
+  <div class="legend-item"><div class="color-box yellow-box"></div> Lightning Risk</div>
 </div>
 
 <script>
@@ -185,12 +187,49 @@ function calculateSevereWeatherPotential({ evapo, salinity, shear, aqi }) {
   return { floodRisk, hailRisk, tornadoRisk, funnelRisk, windRisk };
 }
 
+function calculateLightningRisk({ evapo, salinity, shear, aqi }) {
+  let lightningRisk = "Very Low";
+
+  if (evapo >= 5.0) {
+    lightningRisk = "Low";
+  }
+
+  if (salinity >= 40 && aqi >= 50) {
+    lightningRisk = "Moderate";
+  }
+
+  if (shear >= 1) {
+    if (lightningRisk === "Moderate") {
+      lightningRisk = "High";
+    } else if (lightningRisk === "Low") {
+      lightningRisk = "Moderate";
+    }
+  }
+
+  if (evapo >= 6.0 && salinity >= 60 && shear === 2 && aqi >= 70) {
+    lightningRisk = "Very High";
+  }
+
+  return lightningRisk;
+}
+
 function riskLevelToPercent(level) {
   switch(level) {
     case "Very Low": return 5;
     case "Low": return 20;
     case "Moderate": return 60;
     case "High": return 90;
+    default: return 0;
+  }
+}
+
+function riskLevelToPercentExtended(level) {
+  switch(level) {
+    case "Very Low": return 5;
+    case "Low": return 20;
+    case "Moderate": return 60;
+    case "High": return 90;
+    case "Very High": return 98;
     default: return 0;
   }
 }
@@ -211,16 +250,18 @@ function estimateWindStrength(evapo, shear, aqi) {
   return "Variable";
 }
 
-function updateRiskPercentagesDisplay(risks, evapo, shear, aqi) {
+function updateRiskPercentagesDisplay(risks, evapo, shear, aqi, salinity) {
   const hailSize = estimateHailSize(evapo);
   const windStrength = estimateWindStrength(evapo, shear, aqi);
+  const lightningRisk = calculateLightningRisk({ evapo, salinity, shear, aqi });
 
   riskDiv.textContent =
     `Tornado Risk: ${riskLevelToPercent(risks.tornadoRisk)}%\n` +
     `Funnel Risk: ${riskLevelToPercent(risks.funnelRisk)}%\n` +
     `Hail Risk: ${riskLevelToPercent(risks.hailRisk)}%\n` +
     `Wind Risk: ${riskLevelToPercent(risks.windRisk)}%\n` +
-    `Flooding Risk: ${riskLevelToPercent(risks.floodRisk)}%\n\n` +
+    `Flooding Risk: ${riskLevelToPercent(risks.floodRisk)}%\n` +
+    `Lightning Risk: ${riskLevelToPercentExtended(lightningRisk)}%\n\n` +
     `Estimated Hail Size: ${hailSize}\n` +
     `Estimated Wind Strength: ${windStrength}`;
 }
@@ -241,12 +282,14 @@ function draw() {
 
   points.forEach(({x, y, evapo, salinity, shear, aqi}) => {
     const risks = calculateSevereWeatherPotential({ evapo, salinity, shear, aqi });
+    const lightningRisk = calculateLightningRisk({ evapo, salinity, shear, aqi });
 
     const tornadoPct = riskLevelToPercent(risks.tornadoRisk);
     const funnelPct = riskLevelToPercent(risks.funnelRisk);
     const hailPct = riskLevelToPercent(risks.hailRisk);
     const windPct = riskLevelToPercent(risks.windRisk);
     const floodPct = riskLevelToPercent(risks.floodRisk);
+    const lightningPct = riskLevelToPercentExtended(lightningRisk);
 
     if (tornadoPct >= 60 || funnelPct >= 60) {
       drawSquare(x, y, 20, 'red');
@@ -254,6 +297,8 @@ function draw() {
       drawSquare(x, y, 20, 'purple');
     } else if (floodPct >= 60) {
       drawSquare(x, y, 20, 'green');
+    } else if (lightningPct >= 60) {
+      drawSquare(x, y, 20, 'yellow');
     }
   });
 }
@@ -306,7 +351,7 @@ addUpdateBtn.addEventListener('click', () => {
   draw();
 
   const risks = calculateSevereWeatherPotential({ evapo, salinity, shear, aqi });
-  updateRiskPercentagesDisplay(risks, evapo, shear, aqi);
+  updateRiskPercentagesDisplay(risks, evapo, shear, aqi, salinity);
 });
 
 canvas.addEventListener('click', (e) => {
