@@ -19,6 +19,7 @@
       background:linear-gradient(180deg,#151f35,#10192b);
       border:1px solid #1f2b46; border-radius:18px; padding:18px;
       box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
+      position:relative;
     }
     .grid{ display:grid; gap:14px; grid-template-columns: repeat(12, 1fr); align-items:end; }
     .col-4{ grid-column:span 4 } .col-6{ grid-column:span 6 } .col-12{ grid-column:span 12 }
@@ -63,7 +64,6 @@
     .yn-label{ font-size:12px; color:#e8eef9; z-index:2; margin-left:auto; font-weight:600; }
     .switch:has(input:checked) .yn-label{ color:#9fe7c9 }
 
-    /* Overlay lock */
     #lockOverlay {
       position:absolute; inset:0; background:rgba(0,0,0,.7);
       color:white; font-size:18px; display:flex; align-items:center; justify-content:center;
@@ -95,10 +95,9 @@
     </div>
 
     <!-- APP PANEL -->
-    <div class="panel" style="position:relative">
+    <div class="panel" id="appContainer">
       <div id="lockOverlay">Locked until purchase.</div>
       <div id="appPanel" class="grid">
-        <!-- Weather inputs -->
         <div class="col-4">
           <label for="temp">Temperature (°F)</label>
           <input id="temp" type="number" min="-40" max="60" step="1" value="24" />
@@ -121,25 +120,22 @@
           <span class="badge">≥33°F: no accumulation</span>
         </div>
 
-        <!-- Old-Timer cues -->
         <div class="col-12">
-          <details class="ot" open>
+          <details class="ot">
             <summary>
               <span>Old-Timer No-Snow Cues (Yes/No)</span>
               <span id="otIndex" class="badge">Index: 0 / 10</span>
             </summary>
-
             <div class="switch-row"><div>High, thin clouds</div>
               <label class="switch"><input type="checkbox" id="ot_highThinClouds"><span class="knob"></span><span class="yn-label">No</span></label></div>
             <div class="switch-row"><div>Clouds moving fast from SW</div>
               <label class="switch"><input type="checkbox" id="ot_swFlow"><span class="knob"></span><span class="yn-label">No</span></label></div>
             <div class="switch-row"><div>Moon halo</div>
               <label class="switch"><input type="checkbox" id="ot_moonHalo"><span class="knob"></span><span class="yn-label">No</span></label></div>
-            <!-- (Add other cues here, same format) -->
           </details>
         </div>
 
-        <div class="col-12" style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div class="col-12">
           <button id="go">Get Forecast</button>
         </div>
 
@@ -151,27 +147,39 @@
   </div>
 
   <footer>
-    <div>© <span id="owner">Wayne Adams</span> — Independent research project. Not an official NWS forecast.</div>
+    <div>© Wayne Adams — Independent research project. Not an official NWS forecast.</div>
   </footer>
 
   <script>
     const PAID_FLAG = "snow_paid_v1";
-    function isPaid(){ return localStorage.getItem(PAID_FLAG) === "yes"; }
+    const isPaid = () => localStorage.getItem(PAID_FLAG) === "yes";
 
-    function applyLockOverlay(){
-      const overlay = document.getElementById('lockOverlay');
+    function setDisabled(disabled){
+      const ids = ["temp","dir","speed","go",
+        "ot_highThinClouds","ot_swFlow","ot_moonHalo"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+      });
+    }
+
+    function applyLockUI(){
+      const overlay  = document.getElementById('lockOverlay');
       const payStrip = document.getElementById('payStrip');
       if (isPaid()){
         overlay.style.display = "none";
         payStrip.style.display = "none";
+        setDisabled(false);
       } else {
         overlay.style.display = "flex";
         payStrip.style.display = "block";
+        setDisabled(true);
+        const out = document.getElementById("output");
+        if (out) out.textContent = "Locked until purchase.";
       }
     }
 
-    // run at start
-    applyLockOverlay();
+    applyLockUI();
   </script>
 </body>
 </html>
