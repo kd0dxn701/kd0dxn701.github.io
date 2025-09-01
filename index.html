@@ -19,7 +19,6 @@
       background:linear-gradient(180deg,#151f35,#10192b);
       border:1px solid #1f2b46; border-radius:18px; padding:18px;
       box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
-      position: relative;
     }
     .grid{ display:grid; gap:14px; grid-template-columns: repeat(12, 1fr); align-items:end; }
     .col-4{ grid-column:span 4 } .col-6{ grid-column:span 6 } .col-12{ grid-column:span 12 }
@@ -29,13 +28,16 @@
     input[type="number"], select {
       width:100%; padding:12px 14px; border-radius:12px; border:1px solid #263453;
       background:#0e1524; color:var(--text); outline:none; font-size:16px;
+      transition:border-color .2s ease, box-shadow .2s ease;
     }
+    input[type="number"]:focus, select:focus{ border-color:var(--accent); box-shadow:0 0 0 4px rgba(77,163,255,.12) }
     button{
       padding:13px 16px; border:0; border-radius:12px; font-weight:600; cursor:pointer;
-      background:linear-gradient(180deg,#59b2ff,#3a8df0); color:#041226;
+      background:linear-gradient(180deg,#59b2ff,#3a8df0); color:#041226; letter-spacing:.2px;
+      box-shadow:0 10px 24px rgba(77,163,255,.25), inset 0 1px 0 rgba(255,255,255,.25);
+      transition:transform .08s ease, filter .2s ease;
     }
-    button:hover{ filter:brightness(1.05) }
-    button:active{ transform:translateY(1px) }
+    button:hover{ filter:brightness(1.05) } button:active{ transform:translateY(1px) }
 
     .result{ margin-top:16px; padding:18px; border-radius:16px;
       background:linear-gradient(180deg,#0e1424,#0b1120); border:1px solid #1f2b46; min-height:86px; }
@@ -47,15 +49,25 @@
     footer{ text-align:center; color:var(--muted); font-size:13px; padding:28px 12px 40px; }
     .mini{ font-size:12px; color:#90a3be }
 
+    details.ot{ border:1px solid #1f2b46; border-radius:14px; padding:12px 12px 6px; background:#0f1628; }
+    details.ot > summary{ cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px; user-select:none; color:var(--muted); font-weight:600; }
+    details.ot[open] > summary{ color:var(--text) }
+    .switch-row{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:10px 8px; border-bottom:1px dashed #213255; }
+    .switch-row:last-child{ border-bottom:0 }
+    .switch{ position:relative; width:76px; height:28px; background:#243250; border-radius:999px; border:1px solid #2b3a5d;
+      display:flex; align-items:center; justify-content:flex-start; padding:0 6px; gap:6px; cursor:pointer; user-select:none; }
+    .switch input{ display:none }
+    .knob{ position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%;
+      background:#c6d3ea; transition:left .18s ease, background .2s ease; box-shadow:0 2px 6px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+    .switch input:checked + .knob{ left:50px; background:#9fe7c9 }
+    .yn-label{ font-size:12px; color:#e8eef9; z-index:2; margin-left:auto; font-weight:600; }
+    .switch:has(input:checked) .yn-label{ color:#9fe7c9 }
+
     /* Overlay lock */
-    #lockOverlay{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      background:rgba(4,10,24,.75); border-radius:18px; z-index:5; text-align:center;
-      padding:28px; backdrop-filter:blur(2px);
-    }
-    #lockOverlay .card{
-      background:#0f1628; border:1px solid #1f2b46; border-radius:14px;
-      padding:18px 20px; max-width:560px;
+    #lockOverlay {
+      position:absolute; inset:0; background:rgba(0,0,0,.7);
+      color:white; font-size:18px; display:flex; align-items:center; justify-content:center;
+      border-radius:16px; z-index:10;
     }
   </style>
 </head>
@@ -65,32 +77,27 @@
     <p>Old-Timer No-Snow cues (Yes/No) run before the wind/temperature rules.</p>
   </header>
 
-  <!-- APP -->
   <div class="wrap">
-    <div class="panel" id="appPanel">
-
-      <!-- LOCK OVERLAY -->
-      <div id="lockOverlay">
-        <div class="card">
-          <h3>Locked</h3>
-          <div class="mini" style="margin-bottom:12px">
-            Please purchase to unlock this browser. If you already paid, click unlock.
-          </div>
-          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
-            <a href="https://buy.stripe.com/14k4iT4vl1j82bK288" target="_blank" rel="noopener">
-              <button type="button">Buy with Stripe</button>
-            </a>
-            <a href="./unlock.html">
-              <button type="button" style="background:linear-gradient(180deg,#2bd4a3,#1fb88e)">
-                Already paid? Unlock
-              </button>
-            </a>
-          </div>
+    <!-- PURCHASE STRIP -->
+    <div id="payStrip" class="panel" style="margin-bottom:14px; display:none;">
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <strong>Unlock Full Access</strong>
+          <div class="mini">Pay once; after checkout you’ll be redirected to unlock this browser.</div>
         </div>
+        <a href="https://buy.stripe.com/14k4iT4vl1j82bK288" target="_blank" rel="noopener">
+          <button type="button">Buy with Stripe</button>
+        </a>
+        <a href="./unlock.html">
+          <button type="button" style="background:linear-gradient(180deg,#2bd4a3,#1fb88e)">Already paid? Unlock</button>
+        </a>
       </div>
-      <!-- /LOCK OVERLAY -->
+    </div>
 
-      <div class="grid">
+    <!-- APP PANEL -->
+    <div class="panel" style="position:relative">
+      <div id="lockOverlay">Locked until purchase.</div>
+      <div id="appPanel" class="grid">
         <!-- Weather inputs -->
         <div class="col-4">
           <label for="temp">Temperature (°F)</label>
@@ -110,7 +117,7 @@
 
         <div class="col-12" style="display:flex; gap:10px; flex-wrap:wrap;">
           <span class="badge">19–24°F: full rule set</span>
-          <span class="badge">≤18°F: “new version soon”</span>
+          <span class="badge">≤18°F: “new version soon” message</span>
           <span class="badge">≥33°F: no accumulation</span>
         </div>
 
@@ -121,7 +128,14 @@
               <span>Old-Timer No-Snow Cues (Yes/No)</span>
               <span id="otIndex" class="badge">Index: 0 / 10</span>
             </summary>
-            <!-- (Switch rows omitted here for brevity — keep your original ones) -->
+
+            <div class="switch-row"><div>High, thin clouds</div>
+              <label class="switch"><input type="checkbox" id="ot_highThinClouds"><span class="knob"></span><span class="yn-label">No</span></label></div>
+            <div class="switch-row"><div>Clouds moving fast from SW</div>
+              <label class="switch"><input type="checkbox" id="ot_swFlow"><span class="knob"></span><span class="yn-label">No</span></label></div>
+            <div class="switch-row"><div>Moon halo</div>
+              <label class="switch"><input type="checkbox" id="ot_moonHalo"><span class="knob"></span><span class="yn-label">No</span></label></div>
+            <!-- (Add other cues here, same format) -->
           </details>
         </div>
 
@@ -130,43 +144,34 @@
         </div>
 
         <div class="col-12">
-          <div id="output" class="result">
-            Locked until purchase.
-          </div>
+          <div id="output" class="result">Locked until purchase.</div>
         </div>
       </div>
     </div>
   </div>
 
   <footer>
-    <div>© Wayne Adams — Independent research project. Not an official NWS forecast.</div>
+    <div>© <span id="owner">Wayne Adams</span> — Independent research project. Not an official NWS forecast.</div>
   </footer>
 
   <script>
     const PAID_FLAG = "snow_paid_v1";
-    function isPaid(){ return localStorage.getItem(PAID_FLAG)==="yes"; }
+    function isPaid(){ return localStorage.getItem(PAID_FLAG) === "yes"; }
 
     function applyLockOverlay(){
-      const overlay=document.getElementById('lockOverlay');
-      const app=document.getElementById('appPanel');
-      if(!overlay||!app) return;
-      if(isPaid()){
-        overlay.style.display="none";
-      }else{
-        overlay.style.display="flex";
+      const overlay = document.getElementById('lockOverlay');
+      const payStrip = document.getElementById('payStrip');
+      if (isPaid()){
+        overlay.style.display = "none";
+        payStrip.style.display = "none";
+      } else {
+        overlay.style.display = "flex";
+        payStrip.style.display = "block";
       }
     }
 
-    // Apply lock immediately on load
+    // run at start
     applyLockOverlay();
-
-    // Example: your render function
-    function renderForecast(){
-      if(!isPaid()){ applyLockOverlay(); return; }
-      document.getElementById("output").textContent="Forecast logic here...";
-    }
-
-    document.getElementById("go").addEventListener("click", renderForecast);
   </script>
 </body>
 </html>
