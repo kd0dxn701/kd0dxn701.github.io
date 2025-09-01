@@ -7,7 +7,8 @@
   <style>
     :root{ --bg:#0b1220; --card:#121a2b; --muted:#97a3b6; --text:#e8eef9; --accent:#4da3ff; --ok:#2bd4a3; --warn:#ffd166; --danger:#ff7b7b; }
     *{box-sizing:border-box}
-    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Cantarell,"Helvetica Neue",Arial;
       background: radial-gradient(1200px 800px at 20% -10%, #14203b 0, #0b1220 50%, #060a14 100%);
       color:var(--text);
     }
@@ -39,25 +40,37 @@
     }
     button:hover{ filter:brightness(1.05) } button:active{ transform:translateY(1px) }
 
-    .result{ margin-top:16px; padding:18px; border-radius:16px;
-      background:linear-gradient(180deg,#0e1424,#0b1120); border:1px solid #1f2b46; min-height:86px; }
-    .badge{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
-      background:#0f1c34; border:1px solid #213255; color:var(--muted); margin-right:8px }
+    .result{
+      margin-top:16px; padding:18px; border-radius:16px;
+      background:linear-gradient(180deg,#0e1424,#0b1120);
+      border:1px solid #1f2b46; min-height:86px;
+    }
+    .badge{
+      display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+      background:#0f1c34; border:1px solid #213255; color:var(--muted); margin-right:8px
+    }
     .strong{ color:var(--ok); font-weight:700 }
-    .warn{ color:var(--warn); font-weight:700 } .danger{ color:var(--danger); font-weight:700 }
+    .warn{ color:var(--warn); font-weight:700 }
+    .danger{ color:var(--danger); font-weight:700 }
 
     footer{ text-align:center; color:var(--muted); font-size:13px; padding:28px 12px 40px; }
     .mini{ font-size:12px; color:#90a3be }
+
     details.ot{ border:1px solid #1f2b46; border-radius:14px; padding:12px 12px 6px; background:#0f1628; }
     details.ot > summary{ cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px; user-select:none; color:var(--muted); font-weight:600; }
     details.ot[open] > summary{ color:var(--text) }
     .switch-row{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:10px 8px; border-bottom:1px dashed #213255; }
     .switch-row:last-child{ border-bottom:0 }
-    .switch{ position:relative; width:76px; height:28px; background:#243250; border-radius:999px; border:1px solid #2b3a5d;
-      display:flex; align-items:center; justify-content:flex-start; padding:0 6px; gap:6px; cursor:pointer; user-select:none; }
+    .switch{
+      position:relative; width:76px; height:28px; background:#243250; border-radius:999px; border:1px solid #2b3a5d;
+      display:flex; align-items:center; justify-content:flex-start; padding:0 6px; gap:6px; cursor:pointer; user-select:none;
+    }
     .switch input{ display:none }
-    .knob{ position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%;
-      background:#c6d3ea; transition:left .18s ease, background .2s ease; box-shadow:0 2px 6px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+    .knob{
+      position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:50%;
+      background:#c6d3ea; transition:left .18s ease, background .2s ease;
+      box-shadow:0 2px 6px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
+    }
     .switch input:checked + .knob{ left:50px; background:#9fe7c9 }
     .yn-label{ font-size:12px; color:#e8eef9; z-index:2; margin-left:auto; font-weight:600; }
     .switch:has(input:checked) .yn-label{ color:#9fe7c9 }
@@ -99,6 +112,7 @@
           <label for="temp">Temperature (°F)</label>
           <input id="temp" type="number" min="-40" max="60" step="1" value="24" />
         </div>
+
         <div class="col-4">
           <label for="dir">Wind Direction</label>
           <select id="dir">
@@ -106,6 +120,7 @@
             <option>South</option><option>Southwest</option><option>West</option><option>Northwest</option>
           </select>
         </div>
+
         <div class="col-4">
           <label for="speed">Wind Speed (mph)</label>
           <input id="speed" type="number" min="1" max="21" step="1" value="12" />
@@ -125,35 +140,76 @@
               <span id="otIndex" class="badge">Index: 0 / 10</span>
             </summary>
 
-            <div class="switch-row"><div>High, thin clouds (cirrus/flat stratus) instead of thick, heavy clouds</div>
-              <label class="switch"><input type="checkbox" id="ot_highThinClouds"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Clouds moving fast from the <strong>south or southwest</strong></div>
-              <label class="switch"><input type="checkbox" id="ot_swFlow"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Bright or “watery” halo around the moon</div>
-              <label class="switch"><input type="checkbox" id="ot_moonHalo"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Ground not frozen (soft/muddy)</div>
-              <label class="switch"><input type="checkbox" id="ot_softGround"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Warm wind before the front (southerly/mild feel)</div>
-              <label class="switch"><input type="checkbox" id="ot_warmWind"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Animals notably active (earthworms, insects, frogs calling)</div>
-              <label class="switch"><input type="checkbox" id="ot_animalsActive"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>“Wet” earthy smell in the air</div>
-              <label class="switch"><input type="checkbox" id="ot_wetSmell"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Heavy dew or thick frost morning <em>before</em> the system</div>
-              <label class="switch"><input type="checkbox" id="ot_dewFrost"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Birds staying high/flying freely (not huddled low/silent)</div>
-              <label class="switch"><input type="checkbox" id="ot_birdsHigh"><span class="knob"></span><span class="yn-label">No</span></label></div>
-
-            <div class="switch-row"><div>Livestock calm (not seeking extra shelter)</div>
-              <label class="switch"><input type="checkbox" id="ot_livestockCalm"><span class="knob"></span><span class="yn-label">No</span></label></div>
+            <div class="switch-row">
+              <div>High, thin clouds (cirrus/flat stratus) instead of thick, heavy clouds</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_highThinClouds">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Clouds moving fast from the <strong>south or southwest</strong></div>
+              <label class="switch">
+                <input type="checkbox" id="ot_swFlow">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Bright or “watery” halo around the moon</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_moonHalo">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Ground not frozen (soft/muddy)</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_softGround">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Warm wind before the front (southerly/mild feel)</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_warmWind">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Animals notably active (earthworms, insects, frogs calling)</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_animalsActive">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>“Wet” earthy smell in the air</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_wetSmell">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Heavy dew or thick frost morning <em>before</em> the system</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_dewFrost">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Birds staying high/flying freely (not huddled low/silent)</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_birdsHigh">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
+            <div class="switch-row">
+              <div>Livestock calm (not seeking extra shelter)</div>
+              <label class="switch">
+                <input type="checkbox" id="ot_livestockCalm">
+                <span class="knob"></span><span class="yn-label">No</span>
+              </label>
+            </div>
 
             <div class="mini" style="padding:8px 4px 0;">
               Rule of thumb: Index ≥ <span class="danger"><strong>6</strong></span> → rain/no sticking likely; Index 3–5 → snow possible but lower/slushy.
@@ -179,25 +235,47 @@
     <div>© <span id="owner">Wayne Adams</span> holds the copyright to this forecasting logic. For support or licensing, email <strong>sonfire1@mail.com</strong>. Disclaimer: This forecast model is an independent research project and is provided for educational and informational purposes only. It is not an official National Weather Service (NWS) or government forecast. For official weather warnings, watches, and advisories, consult the NWS or your local emergency management agency.</div>
   </footer>
 
-  <!-- ================= JAVASCRIPT (your model lives here) ================= -->
+  <!-- ================= JAVASCRIPT (model + hard lock) ================= -->
   <script>
-    // --- paywall / lock ------------------------------------------------------
+    // ===== HARD LOCK =====
     const PAID_FLAG = "snow_paid_v1";
-    function setLocked(locked){
-      const app = document.getElementById("appPanel");
-      if (locked) app.classList.add("dim"); else app.classList.remove("dim");
-      const ids = ["temp","dir","speed","go","ot_highThinClouds","ot_swFlow","ot_moonHalo","ot_softGround",
-        "ot_warmWind","ot_animalsActive","ot_wetSmell","ot_dewFrost","ot_birdsHigh","ot_livestockCalm"];
-      ids.forEach(id => { const el = document.getElementById(id); if (el) el.disabled = locked; });
-      const out = document.getElementById("output");
-      if (locked) out.innerHTML = `<div><strong>Locked:</strong> Please purchase to unlock the model in this browser.</div>`;
-      // Hide the pay panel if already unlocked
-      if (!locked){ const pay = document.getElementById("payPanel"); if (pay) pay.style.display = "none"; }
-    }
-    setLocked(localStorage.getItem(PAID_FLAG) !== "yes");
+    const isPaid = () => localStorage.getItem(PAID_FLAG) === "yes";
 
-    // --- helpers -------------------------------------------------------------
+    function hardLockUI() {
+      const app = document.getElementById("appPanel");
+      if (!app) return;
+      app.classList.add("dim");
+      [
+        "temp","dir","speed","go",
+        "ot_highThinClouds","ot_swFlow","ot_moonHalo","ot_softGround","ot_warmWind",
+        "ot_animalsActive","ot_wetSmell","ot_dewFrost","ot_birdsHigh","ot_livestockCalm"
+      ].forEach(id => document.getElementById(id)?.setAttribute("disabled",""));
+      const out = document.getElementById("output");
+      if (out) out.innerHTML = `<div><strong>Locked:</strong> Please purchase to unlock this model.</div>`;
+    }
+
+    function enableUIAfterPaid() {
+      const pay = document.getElementById("payPanel");
+      if (pay) pay.style.display = "none";
+      [
+        "temp","dir","speed","go",
+        "ot_highThinClouds","ot_swFlow","ot_moonHalo","ot_softGround","ot_warmWind",
+        "ot_animalsActive","ot_wetSmell","ot_dewFrost","ot_birdsHigh","ot_livestockCalm"
+      ].forEach(id => document.getElementById(id)?.removeAttribute("disabled"));
+      document.getElementById("appPanel")?.classList.remove("dim");
+    }
+
+    function assertPaidOrStop() {
+      if (isPaid()) { enableUIAfterPaid(); return true; }
+      hardLockUI(); return false;
+    }
+
+    // Enforce lock at load
+    if (!isPaid()) hardLockUI();
+
+    // ===== Helpers & model logic =====
     const dirSet = new Set(["North","Northeast","East","Southeast","South","Southwest","West","Northwest"]);
+
     const NE_inches = (s) => {
       if (s >= 21) return "12 inches or more (blizzard potential if winds exceed 21 mph)";
       if (s === 20) return "11 to 12 inches";
@@ -221,6 +299,7 @@
       if (s === 2)  return "1 to 2 inches";
       return "1 to 2 inches"; // s === 1
     };
+
     const N_inches = (s) => {
       if (s >= 21) return "9 to 10 inches";
       if (s === 20) return "8 to 9 inches";
@@ -244,6 +323,7 @@
       if (s === 2)  return "1 inch";
       return "1 inch"; // s === 1
     };
+
     const E_phrase = (s) => {
       if (s >= 21) return "Snow begins with 2 inches of accumulation possible";
       if (s === 20 || s === 19 || s === 18) return "Snow begins with 1 to 2 inches possible";
@@ -282,7 +362,8 @@
                  (s >= 21 ? " Winds greater than 21 mph can have blizzard potential." : "");
         case "North":
           return `Snow is likely; possible travel implications with ${N_inches(s)} possible.`;
-        default: return "Direction not recognized.";
+        default:
+          return "Direction not recognized.";
       }
     }
 
@@ -290,20 +371,26 @@
       temp = Number(temp);
       speed = Math.max(1, Math.min(21, Number(speed)||0));
       dir = (dirSet.has(dir) ? dir : "North");
+
       if (temp >= 33) return "No snow accumulation expected.";
       if (temp <= 18) return "New version coming soon with these forecasts, or refresh the page to get the new forecast.";
+
       const ot = getOTIndex();
       if (ot >= 6){
         return `Old-timer cue consensus (${ot}/10) suggests rain or non-sticking wet flakes despite cold. Expect mainly rain or a brief mix; accumulation unlikely.`;
       }
+
       const base = directionalLogic(dir, speed);
+
       if (ot >= 3 && ot <= 5){
         return `${base} However, old-timer cues (${ot}/10) lean toward marginal snow: favor the lower end of ranges with slushy/patchy accumulation and mainly wet roads.`;
       }
+
       return base;
     }
 
-    function render(){
+    // Draw function (unguarded)
+    function draw(){
       const t = $("temp").value;
       const d = $("dir").value;
       const s = $("speed").value;
@@ -313,24 +400,39 @@
       out.innerHTML = `
         <div style="font-size:18px; line-height:1.45">
           <div style="margin-bottom:8px"><strong>Forecast:</strong> ${msg}</div>
-          <div class="mini">Inputs — Temperature: <strong>${t}°F</strong>, Direction: <strong>${d}</strong>, Wind: <strong>${s} mph</strong>, Old-Timer Index: <strong>${getOTIndex()} / 10</strong></div>
+          <div class="mini">
+            Inputs — Temperature: <strong>${t}°F</strong>,
+            Direction: <strong>${d}</strong>,
+            Wind: <strong>${s} mph</strong>,
+            Old-Timer Index: <strong>${getOTIndex()} / 10</strong>
+          </div>
         </div>`;
     }
 
-    $("go").addEventListener("click", render);
-    ["temp","dir","speed"].forEach(id=>$(id).addEventListener("input", render));
+    // Guarded render (enforces payment)
+    function renderGuarded(){
+      if (!assertPaidOrStop()) return;
+      draw();
+    }
+
+    // Wire events
+    $("go").addEventListener("click", renderGuarded);
+    ["temp","dir","speed"].forEach(id=>$(id).addEventListener("input", renderGuarded));
     otIds.forEach(id=>{
       const cb = $(id);
-      cb.addEventListener("change", render);
-      cb.parentElement.addEventListener("keydown",(e)=>{ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); cb.checked = !cb.checked; render(); }});
+      cb.addEventListener("change", renderGuarded);
+      // keyboard-friendly toggles
+      cb.parentElement.addEventListener("keydown",(e)=>{
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); cb.checked = !cb.checked; renderGuarded(); }
+      });
       cb.parentElement.setAttribute("tabindex","0");
       cb.parentElement.setAttribute("role","switch");
       cb.parentElement.setAttribute("aria-checked","false");
       cb.addEventListener("change",()=>cb.parentElement.setAttribute("aria-checked", cb.checked ? "true":"false"));
     });
 
-    // initial draw
-    render();
+    // Initial draw (only shows forecast if already paid)
+    if (isPaid()) renderGuarded();
   </script>
 </body>
 </html>
