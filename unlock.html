@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Unlocking…</title>
+<style>
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter}
+  .box{display:flex;align-items:center;justify-content:center;height:100%;background:#0b1220;color:#e8eef9}
+  .card{background:#10192b;border:1px solid #1f2b46;border-radius:14px;padding:24px 28px;max-width:520px;text-align:center}
+  .mini{color:#9fb0c9;font-size:14px;margin-top:8px}
+</style>
+<div class="box">
+  <div class="card">
+    <h2>Thanks! Unlocking this browser…</h2>
+    <div class="mini">If not redirected, <a href="./index.html">click here</a>.</div>
+  </div>
+</div>
+<script>
+  // set the paid flag this app checks
+  try { localStorage.setItem('snow_paid_v1','yes'); } catch(e) {}
+  // go back to the app
+  location.replace('./index.html');
+</script>
+</html>
