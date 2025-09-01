@@ -1,23 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<meta charset="utf-8">
-<title>Unlocking…</title>
-<style>
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter}
-  .box{display:flex;align-items:center;justify-content:center;height:100%;background:#0b1220;color:#e8eef9}
-  .card{background:#10192b;border:1px solid #1f2b46;border-radius:14px;padding:24px 28px;max-width:520px;text-align:center}
-  .mini{color:#9fb0c9;font-size:14px;margin-top:8px}
-</style>
-<div class="box">
-  <div class="card">
-    <h2>Thanks! Unlocking this browser…</h2>
-    <div class="mini">If not redirected, <a href="./index.html">click here</a>.</div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unlocking Snow Forecast Model</title>
+  <style>
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 800px at 20% -10%, #14203b 0, #0b1220 50%, #060a14 100%);
+      color:#e8eef9; display:flex; align-items:center; justify-content:center; height:100vh; text-align:center;
+    }
+    .box {
+      background:linear-gradient(180deg,#151f35,#10192b);
+      border:1px solid #1f2b46; border-radius:18px; padding:32px;
+      max-width:480px; box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    h1 { margin:0 0 12px; font-size:clamp(22px,3vw,32px) }
+    p  { margin:0 0 16px; color:#97a3b6 }
+    button {
+      padding:12px 20px; border:0; border-radius:12px; font-weight:600; cursor:pointer;
+      background:linear-gradient(180deg,#2bd4a3,#1fb88e); color:#041226;
+      box-shadow:0 10px 24px rgba(43,212,163,.25), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Unlock Successful</h1>
+    <p>Your browser is now unlocked. You can access the full Snow Forecast Model.</p>
+    <button onclick="goBack()">Go to Forecast</button>
   </div>
-</div>
-<script>
-  // set the paid flag this app checks
-  try { localStorage.setItem('snow_paid_v1','yes'); } catch(e) {}
-  // go back to the app
-  location.replace('./index.html');
-</script>
+
+  <script>
+    // Set the flag to unlock this browser
+    localStorage.setItem("snow_paid_v1","yes");
+    function goBack(){
+      window.location.href = "./index.html";
+    }
+    // Auto-redirect after a short delay
+    setTimeout(goBack, 4000);
+  </script>
+</body>
 </html>
